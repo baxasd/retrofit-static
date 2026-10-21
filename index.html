@@ -1,0 +1,1500 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Retrofit Digital Twin Presentation</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    },
+                    colors: {
+                        brand: {
+                            50: '#f0fdf4',
+                            100: '#dcfce7',
+                            500: '#16a34a',
+                            600: '#15803d',
+                            700: '#166534',
+                            800: '#14532d',
+                            900: '#052e16',
+                        },
+                        solar: '#d97706',
+                        grid: '#dc2626',
+                        export: '#2563eb',
+                        lightBg: '#f8fafc',
+                        cardBg: '#ffffff'
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f1f5f9;
+            color: #1e293b;
+        }
+        .slide {
+            display: none;
+            opacity: 0;
+            transition: opacity 0.4s ease-in-out;
+        }
+        .slide.active {
+            display: block;
+            opacity: 1;
+        }
+        .glass-card {
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(226, 232, 240, 0.9);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -2px rgba(0, 0, 0, 0.05);
+        }
+        .glow-effect {
+            box-shadow: 0 10px 25px -5px rgba(22, 163, 74, 0.15);
+        }
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .no-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col justify-between overflow-x-hidden">
+
+    <!-- Navigation Header -->
+    <header class="border-b border-slate-200 bg-white/90 backdrop-filter blur-md sticky top-0 z-50 px-4 py-3 shadow-sm">
+        <div class="max-w-7xl mx-auto flex items-center justify-between">
+            <div class="flex items-center space-x-3">
+                <div class="p-2 bg-emerald-100 text-emerald-700 rounded-lg">
+                    <i class="fa-solid fa-bolt text-xl"></i>
+                </div>
+                <div>
+                    <h1 class="text-lg font-bold text-slate-900 tracking-tight">Retrofit Digital Twin</h1>
+                    <p class="text-xs text-slate-500">Presentation Deck</p>
+                </div>
+            </div>
+
+            <!-- Slide Indicator -->
+            <div class="hidden md:flex items-center space-x-2 text-sm font-medium text-slate-500">
+                <span>Slide</span>
+                <span id="currentSlideNum" class="text-emerald-700 font-bold">1</span>
+                <span>/</span>
+                <span id="totalSlidesNum">12</span>
+            </div>
+
+            <!-- Controls -->
+            <div class="flex items-center space-x-2">
+                <button id="prevBtn" onclick="prevSlide()" class="p-2.5 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 transition border border-slate-200 disabled:opacity-40 disabled:cursor-not-allowed">
+                    <i class="fa-solid fa-chevron-left"></i>
+                </button>
+                <button id="nextBtn" onclick="nextSlide()" class="p-2.5 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white transition shadow-sm disabled:opacity-40 disabled:cursor-not-allowed">
+                    <i class="fa-solid fa-chevron-right"></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- Progress Bar -->
+        <div class="w-full bg-slate-200 h-1 mt-3">
+            <div id="progressBar" class="bg-emerald-600 h-1 transition-all duration-300" style="width: 8%;"></div>
+        </div>
+    </header>
+
+    <main class="flex-grow max-w-7xl w-full mx-auto p-4 md:p-6 flex flex-col justify-center">
+
+        <!-- Slide Selector Tabs (Scrollable) -->
+        <div class="mb-6 flex overflow-x-auto space-x-2 pb-2 no-scrollbar border-b border-slate-200" id="slideTabs">
+            <!-- Dynamic Tabs generated via JS -->
+        </div>
+
+        <!-- SLIDE CONTENT AREA -->
+        <div class="relative min-h-[580px] flex items-center">
+
+            <!-- SLIDE 1: COVER / TITLE SLIDE -->
+            <div class="slide active w-full" id="slide-1">
+                <div class="max-w-5xl mx-auto space-y-10 py-6">
+                    <div class="text-center space-y-4">
+                        <div class="inline-flex items-center px-4 py-1.5 rounded-full text-xs font-semibold bg-emerald-100 text-emerald-800 border border-emerald-200">
+                            <i class="fa-solid fa-leaf mr-2"></i> Energy Transition & Decarbonisation
+                        </div>
+                        <h1 class="text-4xl md:text-6xl font-black text-slate-900 tracking-tight leading-tight">
+                            Retrofit Digital Twin
+                        </h1>
+                        <p class="text-lg md:text-xl text-slate-600 max-w-3xl mx-auto font-normal">
+                            A data-driven study on residential decarbonisation, IoT telemetry, and smart energy optimization.
+                        </p>
+                    </div>
+
+                    <!-- Authors Card Box -->
+                    <div class="glass-card p-8 rounded-3xl glow-effect border border-slate-200 max-w-4xl mx-auto">
+                        
+                        <div class="grid md:grid-cols-3 gap-6">
+                            <!-- Author 1 -->
+                            <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm flex flex-col items-center text-center space-y-2">
+                                <div class="w-14 h-14 bg-emerald-100 text-emerald-700 rounded-full flex items-center justify-center text-xl font-bold">
+                                    <i class="fa-solid fa-user-doctor"></i>
+                                </div>
+                                <h3 class="font-bold text-slate-900 text-base">Dr Lisa Haskel</h3>
+                                <p class="text-xs text-emerald-700 font-medium">Lead Researcher</p>
+                            </div>
+
+                            <!-- Author 2 -->
+                            <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm flex flex-col items-center text-center space-y-2">
+                                <div class="w-14 h-14 bg-blue-100 text-blue-700 rounded-full flex items-center justify-center text-xl font-bold">
+                                    <i class="fa-solid fa-user-doctor"></i>
+                                </div>
+                                <h3 class="font-bold text-slate-900 text-base">Dr Jose Paredes</h3>
+                                <p class="text-xs text-blue-700 font-medium">Co-Investigator</p>
+                            </div>
+
+                            <!-- Author 3 -->
+                            <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm flex flex-col items-center text-center space-y-2">
+                                <div class="w-14 h-14 bg-amber-100 text-amber-700 rounded-full flex items-center justify-center text-xl font-bold">
+                                    <i class="fa-solid fa-user-gear"></i>
+                                </div>
+                                <h3 class="font-bold text-slate-900 text-sm">Bakhtiyor Djamshedovich Sohibnazarov</h3>
+                                <p class="text-xs text-amber-700 font-medium">Research Assistant</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Quick System Specs Pill Header -->
+                    <div class="flex flex-wrap justify-center gap-4 text-xs font-medium text-slate-600">
+                        <span class="px-3 py-1 bg-white rounded-lg border border-slate-200 shadow-sm"><i class="fa-solid fa-solar-panel text-amber-500 mr-1.5"></i> 4 kWp Solar PV</span>
+                        <span class="px-3 py-1 bg-white rounded-lg border border-slate-200 shadow-sm"><i class="fa-solid fa-fire-flame-curved text-rose-500 mr-1.5"></i> Air Source Heat Pump</span>
+                        <span class="px-3 py-1 bg-white rounded-lg border border-slate-200 shadow-sm"><i class="fa-solid fa-plug text-emerald-500 mr-1.5"></i> IoT Plugs & Sensors</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- SLIDE 2: Title & Rationale (Part 1) -->
+            <div class="slide w-full" id="slide-2">
+                <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
+                    <div class="lg:col-span-7 space-y-6">
+                        <div class="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-emerald-100 text-emerald-800 border border-emerald-200">
+                            <i class="fa-solid fa-leaf mr-2"></i> Clean Tech & Decarbonisation
+                        </div>
+                        <h1 class="text-4xl md:text-5xl font-extrabold text-slate-900 tracking-tight leading-tight">
+                            Rationale
+                        </h1>
+                        <p class="text-slate-600 text-lg leading-relaxed">
+                            A data-driven project measuring household energy transformation, optimization, and real-world return on investments.
+                        </p>
+                        
+                        <div class="space-y-4 pt-4">
+                            <div class="grid gap-3">
+                                <div class="glass-card p-4 rounded-xl flex items-start space-x-4 border-l-4 border-amber-500">
+                                    <i class="fa-solid fa-coins text-amber-600 text-xl mt-1"></i>
+                                    <div>
+                                        <p class="text-slate-700 text-sm"><i class="text-green-500 mr-1.5">Energy transition</i> is increasingly linked to the cost of living crisis so reducing cost – and showing cost can be reduced - is urgent.</p>
+                                    </div>
+                                </div>
+                                <div class="glass-card p-4 rounded-xl flex items-start space-x-4 border-l-4 border-blue-500">
+                                    <i class="fa-solid fa-piggy-bank text-blue-600 text-xl mt-1"></i>
+                                    <div>
+                                        <p class="text-slate-700 text-sm"><i class="text-green-500 mr-1.5">Government policy</i> is moving towards some homeowners making personal investment to drive transition (combined with grants), so good predictions on returns on investment are required to persuade people to invest.</p>
+                                    </div>
+                                </div>
+                                <div class="glass-card p-4 rounded-xl flex items-start space-x-4 border-l-4 border-emerald-500">
+                                    <i class="fa-solid fa-network-wired text-emerald-600 text-xl mt-1"></i>
+                                    <div>
+                                        <p class="text-slate-700 text-sm"><i class="text-green-500 mr-1.5">Storage</i> is expensive and the grid required updating, so using power when and where its generated is needed.</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="lg:col-span-5">
+                        <div class="glass-card p-8 rounded-2xl glow-effect text-center space-y-6 border border-slate-200">
+                            <div class="w-20 h-20 bg-emerald-100 text-emerald-700 rounded-2xl flex items-center justify-center mx-auto text-3xl">
+                                <i class="fa-solid fa-house-signal"></i>
+                            </div>
+                            <h3 class="text-xl font-bold text-slate-900">Smart Retrofit Ecosystem</h3>
+                            <p class="text-slate-600 text-sm">Integrating IoT data streams, APIs, and micro-sensors into a unified digital twin model.</p>
+                            <div class="grid grid-cols-2 gap-3 text-left pt-2">
+                                <div class="p-3 bg-slate-50 rounded-lg border border-slate-200">
+                                    <div class="text-xs text-slate-500">Solar PV</div>
+                                    <div class="font-semibold text-emerald-700">4 kWp Capacity</div>
+                                </div>
+                                <div class="p-3 bg-slate-50 rounded-lg border border-slate-200">
+                                    <div class="text-xs text-slate-500">Heating</div>
+                                    <div class="font-semibold text-emerald-700">Heat Pump Installed</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- SLIDE 3: Optimisation -->
+            <div class="slide w-full" id="slide-3">
+                <div class="max-w-4xl mx-auto space-y-8">
+                    <div class="text-center space-y-2">
+                        <span class="text-emerald-700 font-semibold text-sm tracking-wider uppercase">Project Foundations</span>
+                        <h2 class="text-3xl font-bold text-slate-900">Optimisation Factors</h2>
+                        <p class="text-slate-600">Optimisation of consumption (cost) is a complex undertaking with multiple factors to take into account including:</p>
+                    </div>
+
+                    <div class="grid md:grid-cols-3 gap-6">
+                        <div class="glass-card p-6 rounded-2xl text-center hover:border-emerald-500 transition">
+                            <div class="w-14 h-14 bg-sky-100 text-sky-600 rounded-xl flex items-center justify-center mx-auto text-2xl mb-4">
+                                <i class="fa-solid fa-cloud-sun-rain"></i>
+                            </div>
+                            <h3 class="text-lg font-bold text-slate-900 mb-2">Weather</h3>
+                            <p class="text-slate-600 text-sm">Unpredictable solar generation and varying heat loads demand ambient weather intelligence.</p>
+                        </div>
+
+                        <div class="glass-card p-6 rounded-2xl text-center hover:border-emerald-500 transition">
+                            <div class="w-14 h-14 bg-amber-100 text-amber-600 rounded-xl flex items-center justify-center mx-auto text-2xl mb-4">
+                                <i class="fa-solid fa-plug"></i>
+                            </div>
+                            <h3 class="text-lg font-bold text-slate-900 mb-2">Home Appliance Differences</h3>
+                            <p class="text-slate-600 text-sm">Varied load cycles, non-linear wattage curves, and peak consumption signatures across devices.</p>
+                        </div>
+
+                        <div class="glass-card p-6 rounded-2xl text-center hover:border-emerald-500 transition">
+                            <div class="w-14 h-14 bg-purple-100 text-purple-600 rounded-xl flex items-center justify-center mx-auto text-2xl mb-4">
+                                <i class="fa-solid fa-user-gear"></i>
+                            </div>
+                            <h3 class="text-lg font-bold text-slate-900 mb-2">Personal Needs and Goals</h3>
+                            <p class="text-slate-600 text-sm">Balancing comfort preferences, daily routines, and financial budget thresholds.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- SLIDE 4: Our Project Scope & Components -->
+            <div class="slide w-full" id="slide-4">
+                <div class="grid lg:grid-cols-2 gap-8 items-center">
+                    <div class="space-y-6">
+                        <div>
+                            <span class="text-emerald-700 font-semibold text-sm tracking-wider uppercase">Project Scope</span>
+                            <h2 class="text-3xl font-bold text-slate-900 mt-1">Our Project & Components</h2>
+                        </div>
+
+                        <div class="glass-card p-5 rounded-2xl border-l-4 border-emerald-600 space-y-2">
+                            <h3 class="font-bold text-slate-900 flex items-center text-lg">
+                                <i class="fa-solid fa-bullseye text-emerald-600 mr-2"></i> Project Goal
+                            </h3>
+                            <p class="text-slate-700 text-sm leading-relaxed">
+                                To gather as much data as can easily be accessed from a retrofitted home, using mostly commodity devices, with a view to a next stage of being able to make forecasts, predictions and automations.
+                            </p>
+                        </div>
+
+                        <div class="space-y-3">
+                            <h3 class="text-sm font-semibold text-slate-500 uppercase tracking-wider">What We Did</h3>
+                            <ul class="space-y-2">
+                                <li class="glass-card p-3 rounded-xl flex items-center space-x-3 text-sm">
+                                    <i class="fa-solid fa-circle-check text-emerald-600"></i>
+                                    <span class="text-slate-700"><strong>Octopus API:</strong> Used for electricity import/export monitoring</span>
+                                </li>
+                                <li class="glass-card p-3 rounded-xl flex items-center space-x-3 text-sm">
+                                    <i class="fa-solid fa-circle-check text-emerald-600"></i>
+                                    <span class="text-slate-700"><strong>Tapo Smart Plugs:</strong> Energy measuring plugs on key appliances</span>
+                                </li>
+                                <li class="glass-card p-3 rounded-xl flex items-center space-x-3 text-sm">
+                                    <i class="fa-solid fa-circle-check text-emerald-600"></i>
+                                    <span class="text-slate-700"><strong>YoLink Sensors:</strong> Temperature and humidity sensors throughout home</span>
+                                </li>
+                                <li class="glass-card p-3 rounded-xl flex items-center space-x-3 text-sm">
+                                    <i class="fa-solid fa-circle-check text-emerald-600"></i>
+                                    <span class="text-slate-700"><strong>Dashboard & Insights:</strong> Live monitoring and initial analytical insights</span>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <!-- System Diagram Box -->
+                    <div class="glass-card p-6 rounded-2xl space-y-4">
+                        <h3 class="font-bold text-slate-900 flex items-center justify-between border-b border-slate-200 pb-3">
+                            <span>Diagram of the System Components</span>
+                            <span class="text-xs bg-slate-100 text-emerald-700 px-2.5 py-1 rounded-full font-mono border border-slate-200">Architecture</span>
+                        </h3>
+                        
+                        <!-- System Architectural Map -->
+<div class="space-y-3 py-2">
+
+    <!-- Tapo Plugs positioned above Raspberry Pi -->
+    <div class="grid grid-cols-4 gap-2 text-center text-xs">
+        
+        <div>
+            <div class="bg-slate-50 p-3 rounded-lg border border-slate-200">
+                <i class="fa-solid fa-plug text-emerald-600 text-lg mb-1 block"></i>
+                <span class="text-slate-800 font-medium">Tapo Plugs</span>
+            </div>
+
+            <!-- Tapo → Raspberry Pi ONLY -->
+            <div class="flex justify-center py-2 text-slate-500">
+                <i class="fa-solid fa-arrow-down-long text-lg"></i>
+            </div>
+        </div>
+
+        <!-- Empty columns -->
+        <div></div>
+        <div></div>
+        <div></div>
+
+    </div>
+
+    <!-- Main Data Sources -->
+    <div class="grid grid-cols-4 gap-2 text-center text-xs">
+
+        <!-- Raspberry Pi -->
+        <div class="bg-white p-3 rounded-lg border border-emerald-300 shadow-sm">
+            <i class="fa-brands fa-raspberry-pi text-emerald-600 text-lg mb-1 block"></i>
+            <div class="font-bold text-slate-900">Raspberry Pi</div>
+            <div class="text-xs text-slate-500 mt-1">Local Collector</div>
+        </div>
+
+        <!-- Octopus API -->
+        <div class="bg-slate-50 p-3 rounded-lg border border-slate-200">
+            <i class="fa-solid fa-cloud text-blue-600 text-lg mb-1 block"></i>
+            <span class="text-slate-800 font-medium">Octopus API</span>
+        </div>
+
+        <!-- YoLink Hub -->
+        <div class="bg-slate-50 p-3 rounded-lg border border-slate-200">
+            <i class="fa-solid fa-temperature-half text-amber-600 text-lg mb-1 block"></i>
+            <span class="text-slate-800 font-medium">YoLink Hub</span>
+        </div>
+
+        <!-- OpenMeteo -->
+        <div class="bg-slate-50 p-3 rounded-lg border border-slate-200">
+            <i class="fa-solid fa-cloud-sun text-sky-600 text-lg mb-1 block"></i>
+            <span class="text-slate-800 font-medium">OpenMeteo</span>
+        </div>
+
+    </div>
+
+    <!-- All four → Retrofit Twin Main App -->
+    <div class="flex justify-center py-1 text-slate-500">
+        <i class="fa-solid fa-arrow-down-long text-lg"></i>
+    </div>
+
+    <!-- Retrofit Twin Main App -->
+    <div class="bg-emerald-50 border border-emerald-200 p-4 rounded-xl text-center">
+        <i class="fa-solid fa-house-laptop text-emerald-700 text-2xl mb-1"></i>
+
+        <div class="font-bold text-emerald-900 text-sm">
+            RETROFIT TWIN MAIN APP
+        </div>
+
+        <div class="text-xs text-emerald-700 mt-1">
+            Dashboard & Forecast Predictions
+        </div>
+    </div>
+
+</div>
+                        <!-- Things we did NOT do -->
+                        <div class="pt-2 border-t border-slate-200">
+                            <h4 class="text-xs font-semibold text-rose-600 uppercase tracking-wider mb-2">Things We Did Not Do</h4>
+                            <ul class="space-y-1.5 text-xs text-slate-600">
+                                <li class="flex items-center space-x-2">
+                                    <i class="fa-solid fa-xmark text-rose-500"></i>
+                                    <span>Gather data directly from the inverter (proprietary data access)</span>
+                                </li>
+                                <li class="flex items-center space-x-2">
+                                    <i class="fa-solid fa-xmark text-rose-500"></i>
+                                    <span>Interact directly with any 'smart' devices</span>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- SLIDE 5: Data & Insights - Overall Picture (1) -->
+            <div class="slide w-full" id="slide-5">
+                <div class="space-y-6">
+                    <div>
+                        <span class="text-emerald-700 font-semibold text-sm tracking-wider uppercase">Installation Baseline</span>
+                        <h2 class="text-3xl font-bold text-slate-900">Data & Insights – Overall Picture</h2>
+                    </div>
+
+                    <div class="grid md:grid-cols-3 gap-6">
+                        <div class="glass-card p-6 rounded-2xl border-t-4 border-amber-500 space-y-3">
+                            <div class="w-12 h-12 bg-amber-100 text-amber-600 rounded-xl flex items-center justify-center text-xl">
+                                <i class="fa-solid fa-solar-panel"></i>
+                            </div>
+                            <h3 class="text-lg font-bold text-slate-900">Solar PV System</h3>
+                            <ul class="text-slate-700 text-sm space-y-2">
+                                <li class="flex justify-between border-b border-slate-100 pb-1">
+                                    <span class="text-slate-500">Installed Since:</span>
+                                    <span class="font-medium text-slate-800">4 May 2022</span>
+                                </li>
+                                <li class="flex justify-between border-b border-slate-100 pb-1">
+                                    <span class="text-slate-500">Operation:</span>
+                                    <span class="font-medium text-emerald-700">&gt; 4 Years Uninterrupted</span>
+                                </li>
+                                <li class="flex justify-between border-b border-slate-100 pb-1">
+                                    <span class="text-slate-500">Panels Layout:</span>
+                                    <span class="font-medium text-slate-800">14 panels (East/West)</span>
+                                </li>
+                                <li class="flex justify-between">
+                                    <span class="text-slate-500">Total Capacity:</span>
+                                    <span class="font-bold text-amber-600">4 kWp</span>
+                                </li>
+                            </ul>
+                        </div>
+
+                        <div class="glass-card p-6 rounded-2xl border-t-4 border-rose-500 space-y-3">
+                            <div class="w-12 h-12 bg-rose-100 text-rose-600 rounded-xl flex items-center justify-center text-xl">
+                                <i class="fa-solid fa-fire-flame-curved"></i>
+                            </div>
+                            <h3 class="text-lg font-bold text-slate-900">Heat Pump Transition</h3>
+                            <ul class="text-slate-700 text-sm space-y-2">
+                                <li class="flex justify-between border-b border-slate-100 pb-1">
+                                    <span class="text-slate-500">Installed:</span>
+                                    <span class="font-medium text-slate-800">Summer 2024</span>
+                                </li>
+                                <li class="flex justify-between border-b border-slate-100 pb-1">
+                                    <span class="text-slate-500">Gas Mains:</span>
+                                    <span class="font-medium text-rose-600">Completely Removed</span>
+                                </li>
+                                <li class="flex justify-between">
+                                    <span class="text-slate-500">Heating Baseline:</span>
+                                    <span class="font-medium text-emerald-700">100% Electrified</span>
+                                </li>
+                            </ul>
+                        </div>
+
+                        <div class="glass-card p-6 rounded-2xl border-t-4 border-slate-400 space-y-3">
+                            <div class="w-12 h-12 bg-slate-100 text-slate-600 rounded-xl flex items-center justify-center text-xl">
+                                <i class="fa-solid fa-battery-empty"></i>
+                            </div>
+                            <h3 class="text-lg font-bold text-slate-900">Storage & EV Status</h3>
+                            <ul class="text-slate-700 text-sm space-y-2">
+                                <li class="flex justify-between border-b border-slate-100 pb-1">
+                                    <span class="text-slate-500">Battery Storage:</span>
+                                    <span class="font-medium text-slate-600">None Installed</span>
+                                </li>
+                                <li class="flex justify-between">
+                                    <span class="text-slate-500">Electric Vehicle:</span>
+                                    <span class="font-medium text-slate-600">None</span>
+                                </li>
+                            </ul>
+                            <div class="p-3 bg-slate-50 rounded-lg text-xs text-slate-500 mt-4 border border-slate-200">
+                                Focuses purely on household consumption optimization without buffer batteries.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- SLIDE 6: Data & Insights - Seasonal Generation Chart -->
+            <div class="slide w-full" id="slide-6">
+                <div class="space-y-4">
+                    <div class="flex justify-between items-end flex-wrap gap-2">
+                        <div>
+                            <span class="text-emerald-700 font-semibold text-sm tracking-wider uppercase">Historical Data</span>
+                            <h2 class="text-3xl font-bold text-slate-900">Seasonal Solar Generation (2025)</h2>
+                        </div>
+                        <div class="text-sm text-slate-600 bg-white px-3 py-1.5 rounded-lg border border-slate-200 shadow-sm">
+                            Source: Inverter (Solarman Web App)
+                        </div>
+                    </div>
+
+                    <div class="glass-card p-5 rounded-2xl">
+                        <div class="h-72 w-full">
+                            <canvas id="seasonalChart"></canvas>
+                        </div>
+                        <div class="mt-4 p-3 bg-slate-50 rounded-xl text-xs text-slate-700 border border-slate-200 flex items-center justify-between">
+                            <span><i class="fa-solid fa-circle-info text-amber-600 mr-1.5"></i> Output is very seasonal – as expected – very good in Summer!</span>
+                            <span class="text-slate-500">Export tariff has varied over the years.</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- SLIDE 7: Data & Insights - Energy Metrics & Money Terms -->
+            <div class="slide w-full" id="slide-7">
+                <div class="space-y-6">
+                    <div>
+                        <span class="text-emerald-700 font-semibold text-sm tracking-wider uppercase">2025 Financials & Energy Balance</span>
+                        <h2 class="text-3xl font-bold text-slate-900">Annual Generation & Cost Breakdown</h2>
+                    </div>
+
+                    <div class="grid md:grid-cols-2 gap-6">
+                        <!-- Energy Volume Card -->
+                        <div class="glass-card p-6 rounded-2xl space-y-4">
+                            <h3 class="text-lg font-bold text-slate-900 flex items-center border-b border-slate-200 pb-3">
+                                <i class="fa-solid fa-bolt text-amber-600 mr-2"></i> Annual Energy Volumes (2025)
+                            </h3>
+                            <div class="grid grid-cols-2 gap-4">
+                                <div class="bg-slate-50 p-4 rounded-xl border border-slate-200">
+                                    <div class="text-xs text-slate-500 mb-1">Annual Generation</div>
+                                    <div class="text-2xl font-extrabold text-amber-600">4,270 <span class="text-xs font-normal text-slate-600">kWh</span></div>
+                                    <div class="text-[10px] text-slate-400 mt-1">(source: inverter app)</div>
+                                </div>
+                                <div class="bg-slate-50 p-4 rounded-xl border border-slate-200">
+                                    <div class="text-xs text-slate-500 mb-1">Self-Used</div>
+                                    <div class="text-2xl font-extrabold text-emerald-600">1,042 <span class="text-xs font-normal text-slate-600">kWh</span></div>
+                                </div>
+                                <div class="bg-slate-50 p-4 rounded-xl border border-slate-200">
+                                    <div class="text-xs text-slate-500 mb-1">Annual Import</div>
+                                    <div class="text-2xl font-extrabold text-rose-600">3,178 <span class="text-xs font-normal text-slate-600">kWh</span></div>
+                                </div>
+                                <div class="bg-slate-50 p-4 rounded-xl border border-slate-200">
+                                    <div class="text-xs text-slate-500 mb-1">Annual Export</div>
+                                    <div class="text-2xl font-extrabold text-blue-600">3,228 <span class="text-xs font-normal text-slate-600">kWh</span></div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Financial Terms Card -->
+                        <div class="glass-card p-6 rounded-2xl space-y-4 border-2 border-emerald-500/30">
+                            <h3 class="text-lg font-bold text-slate-900 flex items-center border-b border-slate-200 pb-3">
+                                <i class="fa-solid fa-sterling-sign text-emerald-600 mr-2"></i> In Money Terms... (2025)
+                            </h3>
+                            <div class="space-y-3">
+                                <div class="flex justify-between items-center p-3 bg-slate-50 rounded-xl border border-slate-200">
+                                    <span class="text-slate-700 text-sm">Billed Electricity Import:</span>
+                                    <span class="text-lg font-bold text-rose-600">£811.30</span>
+                                </div>
+                                <div class="flex justify-between items-center p-3 bg-slate-50 rounded-xl border border-slate-200">
+                                    <div>
+                                        <div class="text-slate-700 text-sm">Export Credit Received:</div>
+                                        <div class="text-xs text-slate-500">(15p per kWh, now down to 12p/kWh)</div>
+                                    </div>
+                                    <span class="text-lg font-bold text-blue-600">- £484.34</span>
+                                </div>
+                                <div class="p-4 bg-emerald-50 border border-emerald-300 rounded-xl flex justify-between items-center">
+                                    <div>
+                                        <div class="text-xs text-emerald-800 uppercase font-bold tracking-wider">Total Annual Net Energy Bills</div>
+                                        <div class="text-xs text-slate-500">(Including standing charges • No Gas)</div>
+                                    </div>
+                                    <div class="text-3xl font-black text-emerald-700">£326.96</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- SLIDE 8: Learnings - Dashboard Days (Bad Day vs Better Day) -->
+            <div class="slide w-full" id="slide-8">
+                <div class="space-y-6">
+                    <div>
+                        <span class="text-emerald-700 font-semibold text-sm tracking-wider uppercase">Dashboard Analysis</span>
+                        <h2 class="text-3xl font-bold text-slate-900">Learnings From the Dashboard: Power Flow Scenarios</h2>
+                    </div>
+
+                    <div class="grid md:grid-cols-2 gap-6">
+                        <!-- Bad Day Card -->
+                        <div class="glass-card p-5 rounded-2xl border-t-4 border-rose-500 space-y-3">
+                            <div class="flex justify-between items-center">
+                                <h3 class="font-bold text-slate-900 text-lg flex items-center">
+                                    <i class="fa-solid fa-thumbs-down text-rose-500 mr-2"></i> Bad Day Scenario
+                                </h3>
+                                <span class="text-xs bg-rose-100 text-rose-800 px-2.5 py-1 rounded-full font-medium border border-rose-200">Net Grid: +0.47 kWh</span>
+                            </div>
+                            <div class="p-3 bg-white rounded-xl border border-slate-200 shadow-inner">
+                                <svg viewBox="0 0 1000 320" class="w-full h-auto text-xs font-sans">
+                                    <g transform="translate(20, 20)">
+                                        <rect x="0" y="3" width="12" height="12" rx="2" fill="#d9534f"/>
+                                        <text x="20" y="13" class="text-xs font-medium" fill="#333">Import</text>
+                                        <rect x="75" y="3" width="12" height="12" rx="2" fill="#428bca"/>
+                                        <text x="95" y="13" class="text-xs font-medium" fill="#333">Export</text>
+                                        <rect x="150" y="3" width="12" height="12" rx="2" fill="#f0ad4e"/>
+                                        <text x="170" y="13" class="text-xs font-medium" fill="#333">Est. solar</text>
+                                    </g>
+                                    <line x1="40" y1="60" x2="980" y2="60" stroke="#eeeeee" stroke-width="1"/>
+                                    <text x="30" y="64" text-anchor="end" fill="#888" font-size="11">2.0</text>
+                                    <line x1="40" y1="110" x2="980" y2="110" stroke="#eeeeee" stroke-width="1"/>
+                                    <text x="30" y="114" text-anchor="end" fill="#888" font-size="11">1.5</text>
+                                    <line x1="40" y1="160" x2="980" y2="160" stroke="#eeeeee" stroke-width="1"/>
+                                    <text x="30" y="164" text-anchor="end" fill="#888" font-size="11">1.0</text>
+                                    <line x1="40" y1="210" x2="980" y2="210" stroke="#eeeeee" stroke-width="1"/>
+                                    <text x="30" y="214" text-anchor="end" fill="#888" font-size="11">0.5</text>
+                                    <line x1="40" y1="260" x2="980" y2="260" stroke="#eeeeee" stroke-width="1"/>
+                                    <text x="30" y="264" text-anchor="end" fill="#888" font-size="11">0.0</text>
+                                    
+                                    <rect x="330" y="60" x2="100" y2="200" fill="#f8f9fa" opacity="0.8"/>
+                                    <rect x="750" y="60" x2="230" y2="200" fill="#f8f9fa" opacity="0.8"/>
+                                    <text x="325" y="80" fill="#f0ad4e" font-size="16">🌅</text>
+                                    <text x="755" y="80" fill="#f0ad4e" font-size="16">🌇</text>
+
+                                    <path d="M 320 260 Q 520 80, 620 90 T 780 260 Z" fill="#fcf8e3" opacity="0.6"/>
+                                    <path d="M 320 260 C 370 230, 420 180, 470 140 C 520 100, 570 90, 610 95 C 660 110, 710 170, 770 260" fill="none" stroke="#f0ad4e" stroke-width="2.5"/>
+
+                                    <path d="M 120 260 L 150 260 Q 180 98, 190 98 Q 200 98, 220 260 Z" fill="#f9ebea" opacity="0.7"/>
+                                    <path d="M 750 260 Q 770 140, 800 98 Q 820 98, 860 260 Z" fill="#f9ebea" opacity="0.7"/>
+
+                                    <path d="M 40 250 L 80 252 L 110 244 L 140 248 L 190 98 L 220 252 L 250 244 L 300 250 L 330 210 L 370 255 L 420 260 L 480 260 L 595 200 L 615 260 L 640 210 L 665 260 L 710 245 L 740 260 L 760 250 L 780 240 L 800 98 L 820 135 L 850 170 L 870 240 L 920 225 L 950 248 L 980 250" fill="none" stroke="#d9534f" stroke-width="2.5"/>
+                                    <path d="M 40 260 L 330 260 L 350 252 L 390 210 L 440 200 L 480 185 L 520 160 L 545 190 L 565 135 L 590 200 L 620 105 L 645 228 L 680 190 L 710 195 L 740 240 L 760 260 L 980 260" fill="none" stroke="#428bca" stroke-width="2.5"/>
+
+                                    <circle cx="190" cy="98" r="3.5" fill="#d9534f"/>
+                                    <circle cx="800" cy="98" r="3.5" fill="#d9534f"/>
+                                    <circle cx="565" cy="135" r="3.5" fill="#428bca"/>
+                                    <circle cx="620" cy="105" r="3.5" fill="#428bca"/>
+
+                                    <text x="40" y="285" fill="#666" font-size="11">00</text>
+                                    <text x="280" y="285" fill="#666" font-size="11">06</text>
+                                    <text x="510" y="285" fill="#666" font-size="11">12</text>
+                                    <text x="750" y="285" fill="#666" font-size="11">18</text>
+                                </svg>
+                            </div>
+                            <div class="grid grid-cols-3 gap-2 text-left pt-1 border-t border-slate-100">
+                                <div>
+                                    <div class="text-[10px] text-slate-400 font-semibold uppercase tracking-wider">IMPORTED</div>
+                                    <div class="text-sm font-extrabold text-slate-800">6.00 <span class="text-xs font-normal text-slate-500">kWh</span></div>
+                                </div>
+                                <div>
+                                    <div class="text-[10px] text-slate-400 font-semibold uppercase tracking-wider">EXPORTED</div>
+                                    <div class="text-sm font-extrabold text-slate-800">5.53 <span class="text-xs font-normal text-slate-500">kWh</span></div>
+                                </div>
+                                <div>
+                                    <div class="text-[10px] text-slate-400 font-semibold uppercase tracking-wider">NET GRID</div>
+                                    <div class="text-sm font-extrabold text-rose-600">+0.47 <span class="text-xs font-normal text-slate-500">kWh</span></div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Better Day Card -->
+                        <div class="glass-card p-5 rounded-2xl border-t-4 border-emerald-600 space-y-3">
+                            <div class="flex justify-between items-center">
+                                <h3 class="font-bold text-slate-900 text-lg flex items-center">
+                                    <i class="fa-solid fa-thumbs-up text-emerald-600 mr-2"></i> Better Day Scenario
+                                </h3>
+                                <span class="text-xs bg-emerald-100 text-emerald-800 px-2.5 py-1 rounded-full font-medium border border-emerald-200">Thu 8 October</span>
+                            </div>
+                            <div class="p-3 bg-white rounded-xl border border-slate-200 shadow-inner">
+                                <svg viewBox="0 0 1000 320" class="w-full h-auto text-xs font-sans">
+                                    <g transform="translate(20, 20)">
+                                        <rect x="0" y="3" width="12" height="12" rx="2" fill="#d9534f"/>
+                                        <text x="20" y="13" class="text-xs font-medium" fill="#333">Import</text>
+                                        <rect x="75" y="3" width="12" height="12" rx="2" fill="#428bca"/>
+                                        <text x="95" y="13" class="text-xs font-medium" fill="#333">Export</text>
+                                        <rect x="150" y="3" width="12" height="12" rx="2" fill="#f0ad4e"/>
+                                        <text x="170" y="13" class="text-xs font-medium" fill="#333">Est. solar</text>
+                                    </g>
+                                    <line x1="40" y1="60" x2="980" y2="60" stroke="#eeeeee" stroke-width="1"/>
+                                    <text x="30" y="64" text-anchor="end" fill="#888" font-size="11">2.0</text>
+                                    <line x1="40" y1="110" x2="980" y2="110" stroke="#eeeeee" stroke-width="1"/>
+                                    <text x="30" y="114" text-anchor="end" fill="#888" font-size="11">1.5</text>
+                                    <line x1="40" y1="160" x2="980" y2="160" stroke="#eeeeee" stroke-width="1"/>
+                                    <text x="30" y="164" text-anchor="end" fill="#888" font-size="11">1.0</text>
+                                    <line x1="40" y1="210" x2="980" y2="210" stroke="#eeeeee" stroke-width="1"/>
+                                    <text x="30" y="214" text-anchor="end" fill="#888" font-size="11">0.5</text>
+                                    <line x1="40" y1="260" x2="980" y2="260" stroke="#eeeeee" stroke-width="1"/>
+                                    <text x="30" y="264" text-anchor="end" fill="#888" font-size="11">0.0</text>
+                                    
+                                    <rect x="330" y="60" x2="100" y2="200" fill="#f8f9fa" opacity="0.8"/>
+                                    <rect x="750" y="60" x2="230" y2="200" fill="#f8f9fa" opacity="0.8"/>
+                                    <text x="325" y="80" fill="#f0ad4e" font-size="16">🌅</text>
+                                    <text x="755" y="80" fill="#f0ad4e" font-size="16">🌇</text>
+
+                                    <path d="M 320 260 Q 520 70, 770 260 Z" fill="#fcf8e3" opacity="0.6"/>
+                                    <path d="M 320 260 Q 520 70, 770 260" fill="none" stroke="#f0ad4e" stroke-width="2.5"/>
+
+                                    <path d="M 120 260 Q 150 95, 170 95 Q 185 95, 200 260 Z" fill="#f9ebea" opacity="0.7"/>
+
+                                    <path d="M 40 250 L 120 252 L 170 95 L 200 255 L 250 242 L 300 252 L 350 260 L 370 242 L 400 260 L 510 260 L 540 205 L 560 215 L 580 260 L 650 260 L 670 243 L 700 260 L 730 248 L 760 248 L 810 240 L 830 225 L 860 240 L 980 250" fill="none" stroke="#d9534f" stroke-width="2.5"/>
+                                    <path d="M 40 260 L 280 260 L 310 203 L 340 193 L 380 210 L 430 172 L 480 130 L 510 115 L 540 188 L 560 198 L 590 118 L 620 142 L 645 112 L 665 225 L 690 243 L 720 260 L 980 260" fill="none" stroke="#428bca" stroke-width="2.5"/>
+
+                                    <circle cx="170" cy="95" r="3.5" fill="#d9534f"/>
+                                    <circle cx="510" cy="115" r="3.5" fill="#428bca"/>
+                                    <circle cx="590" cy="118" r="3.5" fill="#428bca"/>
+
+                                    <text x="40" y="285" fill="#666" font-size="11">00</text>
+                                    <text x="280" y="285" fill="#666" font-size="11">06</text>
+                                    <text x="510" y="285" fill="#666" font-size="11">12</text>
+                                    <text x="750" y="285" fill="#666" font-size="11">18</text>
+                                </svg>
+                            </div>
+                            <div class="grid grid-cols-3 gap-2 text-left pt-1 border-t border-slate-100">
+                                <div>
+                                    <div class="text-[10px] text-slate-400 font-semibold uppercase tracking-wider">IMPORTED</div>
+                                    <div class="text-sm font-extrabold text-slate-800">3.27 <span class="text-xs font-normal text-slate-500">kWh</span></div>
+                                </div>
+                                <div>
+                                    <div class="text-[10px] text-slate-400 font-semibold uppercase tracking-wider">EXPORTED</div>
+                                    <div class="text-sm font-extrabold text-slate-800">7.98 <span class="text-xs font-normal text-slate-500">kWh</span></div>
+                                </div>
+                                <div>
+                                    <div class="text-[10px] text-slate-400 font-semibold uppercase tracking-wider">NET GRID</div>
+                                    <div class="text-sm font-extrabold text-emerald-700">-4.71 <span class="text-xs font-normal text-slate-500">kWh</span></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- SLIDE 9: Dashboard Learnings - Peaky vs Peak Solar Covered -->
+            <div class="slide w-full" id="slide-9">
+                <div class="space-y-6">
+                    <div>
+                        <span class="text-emerald-700 font-semibold text-sm tracking-wider uppercase">Load Curve Comparison</span>
+                        <h2 class="text-3xl font-bold text-slate-900">Learnings: Peaky vs Optimized Self-Generation</h2>
+                    </div>
+
+                    <div class="grid md:grid-cols-2 gap-6">
+                        <!-- Peaky Profile -->
+                        <div class="glass-card p-5 rounded-2xl border-t-4 border-amber-500 space-y-3">
+                            <div class="flex justify-between items-center">
+                                <h3 class="font-bold text-slate-900 text-lg">Sat 3 October - "Peaky" Day</h3>
+                                <span class="text-xs bg-slate-100 text-slate-700 border border-slate-200 px-2.5 py-1 rounded-full font-medium">Net: -0.09 kWh</span>
+                            </div>
+                            <div class="p-3 bg-white rounded-xl border border-slate-200 shadow-inner">
+                                <svg viewBox="0 0 1000 320" class="w-full h-auto text-xs font-sans">
+                                    <g transform="translate(20, 20)">
+                                        <rect x="0" y="3" width="12" height="12" rx="2" fill="#d9534f"/>
+                                        <text x="20" y="13" class="text-xs font-medium" fill="#333">Import</text>
+                                        <rect x="75" y="3" width="12" height="12" rx="2" fill="#428bca"/>
+                                        <text x="95" y="13" class="text-xs font-medium" fill="#333">Export</text>
+                                        <rect x="150" y="3" width="12" height="12" rx="2" fill="#f0ad4e"/>
+                                        <text x="170" y="13" class="text-xs font-medium" fill="#333">Est. solar</text>
+                                    </g>
+                                    <line x1="40" y1="60" x2="980" y2="60" stroke="#eeeeee" stroke-width="1"/>
+                                    <text x="30" y="64" text-anchor="end" fill="#888" font-size="11">2.0</text>
+                                    <line x1="40" y1="110" x2="980" y2="110" stroke="#eeeeee" stroke-width="1"/>
+                                    <text x="30" y="114" text-anchor="end" fill="#888" font-size="11">1.5</text>
+                                    <line x1="40" y1="160" x2="980" y2="160" stroke="#eeeeee" stroke-width="1"/>
+                                    <text x="30" y="164" text-anchor="end" fill="#888" font-size="11">1.0</text>
+                                    <line x1="40" y1="210" x2="980" y2="210" stroke="#eeeeee" stroke-width="1"/>
+                                    <text x="30" y="214" text-anchor="end" fill="#888" font-size="11">0.5</text>
+                                    <line x1="40" y1="260" x2="980" y2="260" stroke="#eeeeee" stroke-width="1"/>
+                                    <text x="30" y="264" text-anchor="end" fill="#888" font-size="11">0.0</text>
+                                    
+                                    <rect x="330" y="60" x2="100" y2="200" fill="#f8f9fa" opacity="0.8"/>
+                                    <rect x="750" y="60" x2="230" y2="200" fill="#f8f9fa" opacity="0.8"/>
+                                    <text x="325" y="80" fill="#f0ad4e" font-size="16">🌅</text>
+                                    <text x="755" y="80" fill="#f0ad4e" font-size="16">🌇</text>
+
+                                    <path d="M 320 260 Q 550 100, 770 260 Z" fill="#fcf8e3" opacity="0.6"/>
+                                    <path d="M 320 260 Q 550 100, 770 260" fill="none" stroke="#f0ad4e" stroke-width="2.5"/>
+
+                                    <path d="M 120 260 Q 150 102, 160 102 Q 175 102, 195 260 Z" fill="#f9ebea" opacity="0.7"/>
+
+                                    <path d="M 40 242 L 120 250 L 160 102 L 195 250 L 250 242 L 300 252 L 320 228 L 350 170 L 380 230 L 400 260 L 430 228 L 470 260 L 500 208 L 530 250 L 550 228 L 570 260 L 730 260 L 750 208 L 780 225 L 800 240 L 980 242" fill="none" stroke="#d9534f" stroke-width="2.5"/>
+                                    <path d="M 40 260 L 300 260 L 330 242 L 360 210 L 400 188 L 430 198 L 460 165 L 485 185 L 515 210 L 545 135 L 570 198 L 610 245 L 640 232 L 670 248 L 700 255 L 730 260 L 980 260" fill="none" stroke="#428bca" stroke-width="2.5"/>
+
+                                    <circle cx="160" cy="102" r="3.5" fill="#d9534f"/>
+                                    <circle cx="545" cy="135" r="3.5" fill="#428bca"/>
+
+                                    <text x="40" y="285" fill="#666" font-size="11">00</text>
+                                    <text x="280" y="285" fill="#666" font-size="11">06</text>
+                                    <text x="510" y="285" fill="#666" font-size="11">12</text>
+                                    <text x="750" y="285" fill="#666" font-size="11">18</text>
+                                </svg>
+                            </div>
+                            <div class="grid grid-cols-3 gap-2 text-left pt-1 border-t border-slate-100">
+                                <div>
+                                    <div class="text-[10px] text-slate-400 font-semibold uppercase tracking-wider">IMPORTED</div>
+                                    <div class="text-sm font-extrabold text-slate-800">4.80 <span class="text-xs font-normal text-slate-500">kWh</span></div>
+                                </div>
+                                <div>
+                                    <div class="text-[10px] text-slate-400 font-semibold uppercase tracking-wider">EXPORTED</div>
+                                    <div class="text-sm font-extrabold text-slate-800">4.88 <span class="text-xs font-normal text-slate-500">kWh</span></div>
+                                </div>
+                                <div>
+                                    <div class="text-[10px] text-slate-400 font-semibold uppercase tracking-wider">NET GRID</div>
+                                    <div class="text-sm font-extrabold text-slate-800">-0.09 <span class="text-xs font-normal text-slate-500">kWh</span></div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Summer Optimized -->
+                        <div class="glass-card p-5 rounded-2xl border-t-4 border-emerald-600 space-y-3">
+                            <div class="flex justify-between items-center">
+                                <h3 class="font-bold text-slate-900 text-lg">Fri 14 August - High Self-Gen</h3>
+                                <span class="text-xs bg-emerald-100 text-emerald-800 border border-emerald-200 px-2.5 py-1 rounded-full font-bold">Net: -12.06 kWh</span>
+                            </div>
+                            <div class="p-3 bg-white rounded-xl border border-slate-200 shadow-inner">
+                                <svg viewBox="0 0 1000 320" class="w-full h-auto text-xs font-sans">
+                                    <g transform="translate(20, 20)">
+                                        <rect x="0" y="3" width="12" height="12" rx="2" fill="#d9534f"/>
+                                        <text x="20" y="13" class="text-xs font-medium" fill="#333">Import</text>
+                                        <rect x="75" y="3" width="12" height="12" rx="2" fill="#428bca"/>
+                                        <text x="95" y="13" class="text-xs font-medium" fill="#333">Export</text>
+                                        <rect x="150" y="3" width="12" height="12" rx="2" fill="#f0ad4e"/>
+                                        <text x="170" y="13" class="text-xs font-medium" fill="#333">Est. solar</text>
+                                    </g>
+                                    <line x1="40" y1="60" x2="980" y2="60" stroke="#eeeeee" stroke-width="1"/>
+                                    <text x="30" y="64" text-anchor="end" fill="#888" font-size="11">3.0</text>
+                                    <line x1="40" y1="126" x2="980" y2="126" stroke="#eeeeee" stroke-width="1"/>
+                                    <text x="30" y="130" text-anchor="end" fill="#888" font-size="11">2.0</text>
+                                    <line x1="40" y1="193" x2="980" y2="193" stroke="#eeeeee" stroke-width="1"/>
+                                    <text x="30" y="197" text-anchor="end" fill="#888" font-size="11">1.0</text>
+                                    <line x1="40" y1="260" x2="980" y2="260" stroke="#eeeeee" stroke-width="1"/>
+                                    <text x="30" y="264" text-anchor="end" fill="#888" font-size="11">0.0</text>
+                                    
+                                    <rect x="330" y="60" x2="100" y2="200" fill="#f8f9fa" opacity="0.8"/>
+                                    <rect x="750" y="60" x2="230" y2="200" fill="#f8f9fa" opacity="0.8"/>
+                                    <text x="325" y="80" fill="#f0ad4e" font-size="16">🌅</text>
+                                    <text x="755" y="80" fill="#f0ad4e" font-size="16">🌇</text>
+
+                                    <path d="M 280 260 Q 550 40, 810 260 Z" fill="#fcf8e3" opacity="0.6"/>
+                                    <path d="M 280 260 Q 550 40, 810 260" fill="none" stroke="#f0ad4e" stroke-width="2.5"/>
+
+                                    <path d="M 830 260 Q 860 110, 875 110 Q 890 110, 915 260 Z" fill="#f9ebea" opacity="0.7"/>
+                                    <path d="M 120 260 Q 150 170, 160 170 Q 170 170, 190 260 Z" fill="#f9ebea" opacity="0.7"/>
+
+                                    <path d="M 40 245 L 120 252 L 160 170 L 190 248 L 240 250 L 330 260 L 350 248 L 420 260 L 440 248 L 510 260 L 540 255 L 610 260 L 630 252 L 730 260 L 760 250 L 790 250 L 830 260 L 875 110 L 900 240 L 940 242 L 980 242" fill="none" stroke="#d9534f" stroke-width="2.5"/>
+                                    <path d="M 40 260 L 260 260 L 290 245 L 320 205 L 360 185 L 400 180 L 430 200 L 470 150 L 500 128 L 520 135 L 550 205 L 570 225 L 590 142 L 620 150 L 660 180 L 700 185 L 730 200 L 770 230 L 800 260 L 980 260" fill="none" stroke="#428bca" stroke-width="2.5"/>
+
+                                    <circle cx="875" cy="110" r="3.5" fill="#d9534f"/>
+                                    <circle cx="500" cy="128" r="3.5" fill="#428bca"/>
+
+                                    <text x="40" y="285" fill="#666" font-size="11">00</text>
+                                    <text x="280" y="285" fill="#666" font-size="11">06</text>
+                                    <text x="510" y="285" fill="#666" font-size="11">12</text>
+                                    <text x="750" y="285" fill="#666" font-size="11">18</text>
+                                </svg>
+                            </div>
+                            <div class="grid grid-cols-3 gap-2 text-left pt-1 border-t border-slate-100">
+                                <div>
+                                    <div class="text-[10px] text-slate-400 font-semibold uppercase tracking-wider">IMPORTED</div>
+                                    <div class="text-sm font-extrabold text-slate-800">4.87 <span class="text-xs font-normal text-slate-500">kWh</span></div>
+                                </div>
+                                <div>
+                                    <div class="text-[10px] text-slate-400 font-semibold uppercase tracking-wider">EXPORTED</div>
+                                    <div class="text-sm font-extrabold text-slate-800">16.92 <span class="text-xs font-normal text-slate-500">kWh</span></div>
+                                </div>
+                                <div>
+                                    <div class="text-[10px] text-slate-400 font-semibold uppercase tracking-wider">NET GRID</div>
+                                    <div class="text-sm font-extrabold text-emerald-700">-12.06 <span class="text-xs font-normal text-slate-500">kWh</span></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- SLIDE 10: Appliances - High Usage Profile -->
+            <div class="slide w-full" id="slide-10">
+                <div class="space-y-6">
+                    <div>
+                        <span class="text-emerald-700 font-semibold text-sm tracking-wider uppercase">Load Disaggregation</span>
+                        <h2 class="text-3xl font-bold text-slate-900">Learnings: Appliances – High Usage Items</h2>
+                    </div>
+
+                    <div class="grid md:grid-cols-3 gap-6">
+                        <!-- Washing Machine -->
+                        <div class="glass-card p-5 rounded-2xl space-y-4">
+                            <div class="flex items-center space-x-3">
+                                <div class="w-10 h-10 bg-blue-100 text-blue-600 rounded-lg flex items-center justify-center font-bold">
+                                    <i class="fa-solid fa-soap"></i>
+                                </div>
+                                <div>
+                                    <h3 class="font-bold text-slate-900">Washing Machine</h3>
+                                    <p class="text-xs text-slate-500">Source: Tapo plug telemetry</p>
+                                </div>
+                            </div>
+                            <div class="p-3 bg-slate-50 rounded-xl border border-slate-200 space-y-2">
+                                <div class="text-xs text-slate-700">Cycle: <strong>Quick 1h 40°C</strong></div>
+                                <div class="text-xl font-bold text-amber-600">0.616 kWh <span class="text-xs text-slate-500 font-normal">(~600W avg)</span></div>
+                                <div class="text-xs text-rose-600"><i class="fa-solid fa-triangle-exclamation mr-1"></i> Highly peaky at beginning of cycle (~2450W heating spike)</div>
+                            </div>
+                        </div>
+
+                        <!-- Dishwasher -->
+                        <div class="glass-card p-5 rounded-2xl space-y-4">
+                            <div class="flex items-center space-x-3">
+                                <div class="w-10 h-10 bg-teal-100 text-teal-600 rounded-lg flex items-center justify-center font-bold">
+                                    <i class="fa-solid fa-kitchen-set"></i>
+                                </div>
+                                <div>
+                                    <h3 class="font-bold text-slate-900">Dishwasher</h3>
+                                    <p class="text-xs text-slate-500">Source: Tapo plug telemetry</p>
+                                </div>
+                            </div>
+                            <div class="p-3 bg-slate-50 rounded-xl border border-slate-200 space-y-2">
+                                <div class="text-xs text-slate-700">Cycle: <strong>4.5h Eco Cycle</strong></div>
+                                <div class="text-xl font-bold text-amber-600">1.001 kWh <span class="text-xs text-slate-500 font-normal">(~222W avg equivalent)</span></div>
+                                <div class="text-xs text-rose-600"><i class="fa-solid fa-chart-line mr-1"></i> Two distinct heat spikes: 15m and 2h 10m into cycle (~2300W)</div>
+                            </div>
+                        </div>
+
+                        <!-- Heat Pump Hot Water -->
+                        <div class="glass-card p-5 rounded-2xl space-y-4">
+                            <div class="flex items-center space-x-3">
+                                <div class="w-10 h-10 bg-rose-100 text-rose-600 rounded-lg flex items-center justify-center font-bold">
+                                    <i class="fa-solid fa-temperature-arrow-up"></i>
+                                </div>
+                                <div>
+                                    <h3 class="font-bold text-slate-900">Heat Pump (Hot Water)</h3>
+                                    <p class="text-xs text-slate-500">Source: Night baseline telemetry</p>
+                                </div>
+                            </div>
+                            <div class="p-3 bg-slate-50 rounded-xl border border-slate-200 space-y-2">
+                                <div class="text-xs text-slate-700">Duration: <strong>30 minutes</strong></div>
+                                <div class="text-xl font-bold text-amber-600">0.800 kWh <span class="text-xs text-slate-500 font-normal">(incl. baseload)</span></div>
+                                <div class="text-xs text-emerald-700"><i class="fa-solid fa-bolt mr-1"></i> ~1500W flat draw (excluding house baseload)</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Side-by-side Stem Plots for Washing Machine & Dishwasher -->
+                    <div class="grid md:grid-cols-2 gap-6">
+                        <!-- Washing Machine Stem Plot -->
+                        <div class="glass-card p-5 rounded-2xl space-y-2">
+                            <div class="flex justify-between items-center mb-1">
+                                <h4 class="text-xs font-bold text-slate-800 uppercase tracking-wider flex items-center">
+                                    <i class="fa-solid fa-soap text-blue-600 mr-2"></i> Washing Machine Stem Plot
+                                </h4>
+                                <span class="text-[11px] bg-blue-50 text-blue-700 px-2 py-0.5 rounded border border-blue-200 font-semibold">Discrete Telemetry (W)</span>
+                            </div>
+                            <div class="h-44 w-full">
+                                <canvas id="washingMachineChart"></canvas>
+                            </div>
+                        </div>
+
+                        <!-- Dishwasher Stem Plot -->
+                        <div class="glass-card p-5 rounded-2xl space-y-2">
+                            <div class="flex justify-between items-center mb-1">
+                                <h4 class="text-xs font-bold text-slate-800 uppercase tracking-wider flex items-center">
+                                    <i class="fa-solid fa-kitchen-set text-teal-600 mr-2"></i> Dishwasher Stem Plot
+                                </h4>
+                                <span class="text-[11px] bg-teal-50 text-teal-700 px-2 py-0.5 rounded border border-teal-200 font-semibold">Discrete Telemetry (W)</span>
+                            </div>
+                            <div class="h-44 w-full">
+                                <canvas id="dishwasherChart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- SLIDE 11: Insights – Timeshifting Scenarios -->
+            <div class="slide w-full" id="slide-11">
+                <div class="space-y-6">
+                    <div>
+                        <span class="text-emerald-700 font-semibold text-sm tracking-wider uppercase">Strategic Automation</span>
+                        <h2 class="text-3xl font-bold text-slate-900">Insights: Timeshifting Scenarios</h2>
+                    </div>
+
+                    <div class="glass-card p-5 rounded-2xl border-l-4 border-amber-500">
+                        <p class="text-slate-800 text-sm leading-relaxed">
+                            <strong>Timeshifting needed to use self-generated electricity.</strong> The most efficient timings will vary according to weather, time-of-day tariffs and patterns of individual appliances.
+                        </p>
+                    </div>
+
+                    <div class="grid md:grid-cols-2 gap-6">
+                        <!-- Scenario 1: No Scheduling -->
+                        <div class="glass-card p-5 rounded-2xl space-y-3">
+                            <div class="flex justify-between items-center border-b border-slate-200 pb-2">
+                                <h3 class="font-bold text-slate-900 text-base">Scenario 1: No Scheduling</h3>
+                                <span class="text-xs bg-rose-100 text-rose-800 border border-rose-200 px-2 py-0.5 rounded">Unoptimized</span>
+                            </div>
+                            <div class="h-36 w-full">
+                                <canvas id="scenarioNoSchedChart"></canvas>
+                            </div>
+                            <p class="text-xs text-slate-500">High load spikes occur during off-peak solar production (e.g. early morning or night), forcing grid imports.</p>
+                        </div>
+
+                        <!-- Scenario 2: Time Shift -->
+                        <div class="glass-card p-5 rounded-2xl space-y-3">
+                            <div class="flex justify-between items-center border-b border-slate-200 pb-2">
+                                <h3 class="font-bold text-slate-900 text-base">Scenario 2: Time Shift</h3>
+                                <span class="text-xs bg-emerald-100 text-emerald-800 border border-emerald-200 px-2 py-0.5 rounded">Optimized</span>
+                            </div>
+                            <div class="h-36 w-full">
+                                <canvas id="scenarioShiftChart"></canvas>
+                            </div>
+                            <p class="text-xs text-emerald-800 font-medium">Loads are shifted directly into the solar generation bell-curve, maximizing self-consumption and reducing import bills.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- SLIDE 12: Weather Variability & Winter Strategy (Clean Cheap Area Highlights) -->
+<div class="slide w-full active" id="slide-12">
+    <div class="space-y-6 max-w-7xl mx-auto p-4 md:p-6">
+        <div>
+            <span class="text-emerald-700 font-semibold text-sm tracking-wider uppercase">Future Horizons & Seasonal Strategy</span>
+            <h2 class="text-3xl font-bold text-slate-900">Winter Strategy: Shifting to Low-Tariff Hours</h2>
+        </div>
+
+        <div class="glass-card p-6 rounded-2xl space-y-4 bg-white/85 backdrop-blur-md border border-slate-200 shadow-sm">
+            <div class="flex flex-col md:flex-row justify-between items-start md:items-center border-b border-slate-200 pb-3 gap-2">
+                <div>
+                    <h3 class="font-bold text-slate-900 text-base">Solar Generation Curves vs. Octopus Cosy Tariff "Triple Dip"</h3>
+                    <p class="text-xs text-slate-500">Comparing Summer & Winter solar yield curves with highlighted off-peak low-tariff windows (p/kWh).</p>
+                </div>
+                <div class="flex flex-wrap items-center gap-3 text-xs">
+                    <span class="flex items-center"><span class="w-3 h-3 rounded-full bg-amber-500 mr-1.5"></span> Summer Solar</span>
+                    <span class="flex items-center"><span class="w-3 h-3 rounded-full bg-slate-400 mr-1.5"></span> Winter Solar</span>
+                    <span class="flex items-center"><span class="w-3 h-3 rounded-full bg-fuchsia-600 mr-1.5"></span> Cosy Tariff</span>
+                    <span class="flex items-center px-2 py-0.5 rounded bg-fuchsia-100 text-fuchsia-800 font-medium border border-fuchsia-200"><span class="w-2.5 h-2.5 rounded-sm bg-fuchsia-400 mr-1.5"></span> Cheap Energy Dips</span>
+                </div>
+            </div>
+
+            <!-- Combined Overlapped Dual Y-Axis Chart -->
+            <div class="h-64 w-full">
+                <canvas id="winterStrategyChart"></canvas>
+            </div>
+
+            <!-- Explanatory Callout Box -->
+            <div class="p-4 bg-blue-50 border border-blue-200 rounded-xl text-xs text-slate-800 space-y-1.5">
+                <div class="font-bold text-blue-900 flex items-center text-sm">
+                    <i class="fa-solid fa-lightbulb text-amber-500 mr-2"></i> Winter Adjustment Requirement
+                </div>
+                <p class="text-slate-700 leading-relaxed">
+                    Because winter solar yield drops significantly (reaching only ~500W at mid-day peak), afternoon solar timeshifting alone is no longer sufficient. Heavy loads should be shifted into the highlighted <strong>"Triple Dip" low-tariff windows (04:00–07:00, 13:00–16:00, and 22:00–00:00)</strong> to run Heat Pump hot water cycles, Dishwasher, and Washing Machine at minimal cost while avoiding the expensive 16:00–19:00 peak rate.
+                </p>
+            </div>
+        </div>
+
+        <!-- Summary Footer -->
+        <div class="glass-card p-4 rounded-xl text-center space-y-1 bg-gradient-to-r from-emerald-50 via-white to-blue-50 border border-emerald-300 shadow-sm">
+            <div class="text-sm font-bold text-slate-900">Digital Twin Next Stage: Predictive Forecasting & Automated Control</div>
+            <div class="text-xs text-slate-600">Combining real-time API feedback with predictive weather algorithms for hands-free energy optimization.</div>
+        </div>
+    </div>
+</div>
+
+<script class="slide-script">
+    (function renderWinterStrategyChart() {
+        const ctx = document.getElementById('winterStrategyChart').getContext('2d');
+        
+        // Single plugin drawing smooth, non-overlapping background highlight bands for cheap hours
+        const cheapRegionsPlugin = {
+            id: 'cheapRegionsHighlight',
+            beforeDraw(chart) {
+                const { ctx, chartArea, scales: { x } } = chart;
+                if (!chartArea) return;
+
+                const cheapWindows = [
+                    { start: '04:00', end: '07:00' },
+                    { start: '13:00', end: '16:00' },
+                    { start: '22:00', end: '24:00' }
+                ];
+
+                ctx.save();
+                ctx.fillStyle = 'rgba(217, 70, 239, 0.15)'; // Uniform fuchsia tint
+
+                cheapWindows.forEach(win => {
+                    const startX = x.getPixelForValue(win.start);
+                    const endX = x.getPixelForValue(win.end);
+                    if (startX !== undefined && endX !== undefined) {
+                        ctx.fillRect(startX, chartArea.top, endX - startX, chartArea.height);
+                    }
+                });
+
+                ctx.restore();
+            }
+        };
+
+        new Chart(ctx, {
+            type: 'line',
+            plugins: [cheapRegionsPlugin],
+            data: {
+                labels: [
+                    '00:00', '01:00', '02:00', '03:00', '04:00', '05:00', '06:00', '07:00', 
+                    '08:00', '09:00', '10:00', '11:00', '12:00', '13:00', '14:00', '15:00', 
+                    '16:00', '17:00', '18:00', '19:00', '20:00', '21:00', '22:00', '23:00', '24:00'
+                ],
+                datasets: [
+                    {
+                        label: 'Summer Solar Curve (W)',
+                        data: [0, 0, 0, 0, 0, 50, 200, 500, 900, 1500, 2100, 2500, 2800, 2750, 2600, 2200, 1800, 1200, 600, 150, 0, 0, 0, 0, 0],
+                        borderColor: '#d97706',
+                        backgroundColor: 'rgba(217, 119, 6, 0.08)',
+                        fill: true,
+                        tension: 0.4,
+                        pointRadius: 0,
+                        yAxisID: 'y'
+                    },
+                    {
+                        label: 'Winter Solar Curve (W)',
+                        data: [0, 0, 0, 0, 0, 0, 0, 10, 50, 120, 250, 420, 520, 480, 380, 210, 80, 5, 0, 0, 0, 0, 0, 0, 0],
+                        borderColor: '#64748b',
+                        backgroundColor: 'rgba(100, 116, 139, 0.08)',
+                        fill: true,
+                        tension: 0.4,
+                        pointRadius: 0,
+                        yAxisID: 'y'
+                    },
+                    {
+                        label: 'Cosy Tariff Rate (p/kWh)',
+                        data: [
+                            22, 22, 22, 22, 
+                            11, 11, 11, 
+                            22, 22, 22, 22, 22, 22, 
+                            11, 11, 11, 
+                            38, 38, 38, 
+                            22, 22, 22, 
+                            11, 11, 22
+                        ],
+                        borderColor: '#d946ef',
+                        backgroundColor: 'transparent',
+                        borderWidth: 3,
+                        tension: 0,
+                        stepped: 'before',
+                        pointRadius: 0,
+                        yAxisID: 'yPrice'
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                interaction: { mode: 'index', intersect: false },
+                plugins: {
+                    legend: { display: false }
+                },
+                scales: {
+                    x: { 
+                        grid: { color: '#f1f5f9' },
+                        ticks: { font: { size: 10 }, maxRotation: 0 }
+                    },
+                    y: {
+                        type: 'linear',
+                        display: true,
+                        position: 'left',
+                        title: { display: true, text: 'Solar Yield (Watts)', color: '#475569', font: { size: 11, weight: 'bold' } },
+                        grid: { color: '#f1f5f9' },
+                        min: 0,
+                        max: 3000
+                    },
+                    yPrice: {
+                        type: 'linear',
+                        display: true,
+                        position: 'right',
+                        title: { display: true, text: 'Tariff Rate (p/kWh)', color: '#d946ef', font: { size: 11, weight: 'bold' } },
+                        grid: { drawOnChartArea: false },
+                        min: 0,
+                        max: 45
+                    }
+                }
+            }
+        });
+    })();
+</script>
+
+
+
+        </div>
+    </main>
+
+    <!-- Footer Bar -->
+    <footer class="border-t border-slate-200 bg-white/90 py-3 px-4 shadow-sm">
+        <div class="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between text-xs text-slate-500 gap-2">
+            <div>Retrofit Digital Twin Study • Authors: Dr Lisa Haskel, Dr Jose Paredes, Bakhtiyor Sohibnazarov</div>
+            <div class="flex items-center space-x-4">
+                <span><i class="fa-solid fa-keyboard mr-1"></i> Use &larr; &rarr; Arrow Keys to Navigate</span>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        const slidesData = [
+            { id: 1, title: "1. Cover & Authors" },
+            { id: 2, title: "2. Rationale" },
+            { id: 3, title: "3. Optimisation" },
+            { id: 4, title: "4. Scope & System" },
+            { id: 5, title: "5. Setup Baseline" },
+            { id: 6, title: "6. Solar Generation" },
+            { id: 7, title: "7. Energy & Cost" },
+            { id: 8, title: "8. Dashboard Days" },
+            { id: 9, title: "9. Load Profiles" },
+            { id: 10, title: "10. Appliance Stems" },
+            { id: 11, title: "11. Timeshifting" },
+            { id: 12, title: "12. Winter Strategy" }
+        ];
+
+        let currentSlide = 1;
+        const totalSlides = slidesData.length;
+        let chartInstances = {};
+
+        function initTabs() {
+            const tabsContainer = document.getElementById('slideTabs');
+            tabsContainer.innerHTML = '';
+            slidesData.forEach(s => {
+                const btn = document.createElement('button');
+                btn.className = `px-3.5 py-1.5 rounded-lg text-xs font-semibold whitespace-nowrap transition-all ${
+                    s.id === currentSlide 
+                    ? 'bg-emerald-600 text-white shadow-sm' 
+                    : 'bg-white text-slate-600 hover:bg-slate-100 hover:text-slate-900 border border-slate-200'
+                }`;
+                btn.innerText = s.title;
+                btn.onclick = () => goToSlide(s.id);
+                btn.id = `tab-btn-${s.id}`;
+                tabsContainer.appendChild(btn);
+            });
+        }
+
+        function updateUI() {
+            document.querySelectorAll('.slide').forEach((el, idx) => {
+                if (idx + 1 === currentSlide) {
+                    el.classList.add('active');
+                } else {
+                    el.classList.remove('active');
+                }
+            });
+
+            slidesData.forEach(s => {
+                const btn = document.getElementById(`tab-btn-${s.id}`);
+                if (btn) {
+                    if (s.id === currentSlide) {
+                        btn.className = 'px-3.5 py-1.5 rounded-lg text-xs font-semibold whitespace-nowrap transition-all bg-emerald-600 text-white shadow-sm';
+                        btn.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+                    } else {
+                        btn.className = 'px-3.5 py-1.5 rounded-lg text-xs font-semibold whitespace-nowrap transition-all bg-white text-slate-600 hover:bg-slate-100 hover:text-slate-900 border border-slate-200';
+                    }
+                }
+            });
+
+            document.getElementById('currentSlideNum').innerText = currentSlide;
+            document.getElementById('totalSlidesNum').innerText = totalSlides;
+            document.getElementById('progressBar').style.width = `${(currentSlide / totalSlides) * 100}%`;
+
+            document.getElementById('prevBtn').disabled = currentSlide === 1;
+            document.getElementById('nextBtn').disabled = currentSlide === totalSlides;
+
+            renderSlideCharts(currentSlide);
+        }
+
+        function goToSlide(n) {
+            if (n >= 1 && n <= totalSlides) {
+                currentSlide = n;
+                updateUI();
+            }
+        }
+
+        function nextSlide() {
+            if (currentSlide < totalSlides) {
+                currentSlide++;
+                updateUI();
+            }
+        }
+
+        function prevSlide() {
+            if (currentSlide > 1) {
+                currentSlide--;
+                updateUI();
+            }
+        }
+
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowRight' || e.key === 'Space') {
+                nextSlide();
+            } else if (e.key === 'ArrowLeft') {
+                prevSlide();
+            }
+        });
+
+        function renderSlideCharts(slideNum) {
+            Chart.defaults.color = '#475569';
+            Chart.defaults.font.family = 'Inter';
+
+            if (slideNum === 6 && !chartInstances['seasonal']) {
+                const ctx = document.getElementById('seasonalChart').getContext('2d');
+                chartInstances['seasonal'] = new Chart(ctx, {
+                    type: 'bar',
+                    data: {
+                        labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
+                        datasets: [{
+                            label: 'Photovoltaic Power Generation (kWh)',
+                            data: [62, 124, 360, 553, 672, 701, 612, 524, 345, 162, 82, 51],
+                            backgroundColor: '#2563eb',
+                            borderRadius: 6
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: { legend: { display: true, position: 'top' } },
+                        scales: {
+                            y: { grid: { color: '#e2e8f0' }, title: { display: true, text: 'kWh' } },
+                            x: { grid: { display: false } }
+                        }
+                    }
+                });
+            }
+
+            if (slideNum === 10 && !chartInstances['washingMachine']) {
+                const ctxWm = document.getElementById('washingMachineChart').getContext('2d');
+                chartInstances['washingMachine'] = new Chart(ctxWm, {
+                    type: 'bar',
+                    data: {
+                        labels: ['13:20', '13:30', '13:40', '13:50', '14:00', '14:10', '14:20', '14:30', '14:40', '14:50', '15:00', '15:10', '15:20', '15:30'],
+                        datasets: [
+                            {
+                                type: 'bar',
+                                label: 'Stem',
+                                data: [20, 2400, 2500, 90, 30, 80, 90, 95, 40, 160, 250, 10, 10, 0],
+                                backgroundColor: '#1d4ed8',
+                                barThickness: 3,
+                                order: 2
+                            },
+                            {
+                                type: 'line',
+                                label: 'Marker',
+                                data: [20, 2400, 2500, 90, 30, 80, 90, 95, 40, 160, 250, 10, 10, 0],
+                                borderColor: 'transparent',
+                                backgroundColor: '#1d4ed8',
+                                pointRadius: 5,
+                                pointHoverRadius: 7,
+                                showLine: false,
+                                order: 1
+                            }
+                        ]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: { legend: { display: false } },
+                        scales: { 
+                            y: { grid: { color: '#f1f5f9' }, title: { display: true, text: 'Watts (W)' }, min: 0, max: 3000 }, 
+                            x: { grid: { color: '#f1f5f9' }, ticks: { maxRotation: 45, minRotation: 45, font: { size: 9 } } } 
+                        }
+                    }
+                });
+
+                const ctxDw = document.getElementById('dishwasherChart').getContext('2d');
+                chartInstances['dishwasher'] = new Chart(ctxDw, {
+                    type: 'bar',
+                    data: {
+                        labels: ['08:50', '09:10', '09:30', '09:50', '10:10', '10:30', '10:50', '11:10', '11:30', '11:50', '12:10', '12:30', '12:50', '13:10', '13:30', '13:50', '14:10', '14:30', '14:50', '15:10', '15:30'],
+                        datasets: [
+                            {
+                                type: 'bar',
+                                label: 'Stem',
+                                data: [30, 2320, 2280, 45, 40, 40, 40, 40, 35, 2250, 2220, 2180, 15, 10, 10, 10, 10, 10, 10, 10, 10],
+                                backgroundColor: '#0f766e',
+                                barThickness: 3,
+                                order: 2
+                            },
+                            {
+                                type: 'line',
+                                label: 'Marker',
+                                data: [30, 2320, 2280, 45, 40, 40, 40, 40, 35, 2250, 2220, 2180, 15, 10, 10, 10, 10, 10, 10, 10, 10],
+                                borderColor: 'transparent',
+                                backgroundColor: '#0f766e',
+                                pointRadius: 5,
+                                pointHoverRadius: 7,
+                                showLine: false,
+                                order: 1
+                            }
+                        ]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: { legend: { display: false } },
+                        scales: { 
+                            y: { grid: { color: '#f1f5f9' }, title: { display: true, text: 'Watts (W)' }, min: 0, max: 2800 }, 
+                            x: { grid: { color: '#f1f5f9' }, ticks: { maxRotation: 45, minRotation: 45, font: { size: 8 } } } 
+                        }
+                    }
+                });
+            }
+
+            if (slideNum === 11 && !chartInstances['scenarioNoSched']) {
+                const ctxNo = document.getElementById('scenarioNoSchedChart').getContext('2d');
+                chartInstances['scenarioNoSched'] = new Chart(ctxNo, {
+                    type: 'bar',
+                    data: {
+                        labels: ['00:00', '03:00', '06:00', '09:00', '12:00', '15:00', '18:00', '21:00'],
+                        datasets: [
+                            { label: 'Load Spikes (W)', data: [100, 1600, 100, 2100, 150, 2100, 2100, 500], backgroundColor: '#16a34a', type: 'bar' },
+                            { label: 'Solar Curve', data: [0, 0, 0, 800, 1800, 1900, 600, 0], borderColor: '#d97706', type: 'line', tension: 0.4 }
+                        ]
+                    },
+                    options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { grid: { color: '#f1f5f9' } }, x: { grid: { color: '#f1f5f9' } } } }
+                });
+
+                const ctxShift = document.getElementById('scenarioShiftChart').getContext('2d');
+                chartInstances['scenarioShift'] = new Chart(ctxShift, {
+                    type: 'bar',
+                    data: {
+                        labels: ['00:00', '03:00', '06:00', '09:00', '12:00', '15:00', '18:00', '21:00'],
+                        datasets: [
+                            { label: 'Shifted Load (W)', data: [100, 100, 100, 1600, 2100, 2100, 500, 100], backgroundColor: '#16a34a', type: 'bar' },
+                            { label: 'Solar Curve', data: [0, 0, 0, 800, 1800, 1900, 600, 0], borderColor: '#d97706', type: 'line', tension: 0.4 }
+                        ]
+                    },
+                    options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { grid: { color: '#f1f5f9' } }, x: { grid: { color: '#f1f5f9' } } } }
+                });
+            }
+
+            if (slideNum === 12 && !chartInstances['winterStrategy']) {
+                const ctxStrat = document.getElementById('winterStrategyChart').getContext('2d');
+                chartInstances['winterStrategy'] = new Chart(ctxStrat, {
+                    type: 'line',
+                    data: {
+                        labels: ['00:00', '02:00', '04:00', '06:00', '08:00', '10:00', '12:00', '14:00', '16:00', '18:00', '20:00', '22:00'],
+                        datasets: [
+                            {
+                                label: 'Summer Solar Curve (W)',
+                                data: [0, 0, 0, 200, 900, 2100, 2800, 2600, 1800, 600, 0, 0],
+                                borderColor: '#d97706',
+                                backgroundColor: 'rgba(217, 119, 6, 0.1)',
+                                fill: true,
+                                tension: 0.4,
+                                yAxisID: 'y'
+                            },
+                            {
+                                label: 'Winter Solar Curve (W)',
+                                data: [0, 0, 0, 0, 50, 250, 520, 380, 80, 0, 0, 0],
+                                borderColor: '#64748b',
+                                backgroundColor: 'rgba(100, 116, 139, 0.1)',
+                                fill: true,
+                                tension: 0.4,
+                                yAxisID: 'y'
+                            },
+                            {
+                                label: 'Octopus Dynamic Tariff Price (p/kWh)',
+                                data: [14, 12, 11, 15, 24, 28, 25, 22, 34, 38, 29, 18],
+                                borderColor: '#e11d48',
+                                backgroundColor: 'transparent',
+                                borderWidth: 3,
+                                borderDash: [4, 4],
+                                tension: 0.3,
+                                yAxisID: 'yPrice'
+                            }
+                        ]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        interaction: { mode: 'index', intersect: false },
+                        plugins: {
+                            legend: { display: false }
+                        },
+                        scales: {
+                            x: { grid: { color: '#f1f5f9' } },
+                            y: {
+                                type: 'linear',
+                                display: true,
+                                position: 'left',
+                                title: { display: true, text: 'Solar Yield (Watts)', color: '#475569' },
+                                grid: { color: '#f1f5f9' },
+                                min: 0,
+                                max: 3000
+                            },
+                            yPrice: {
+                                type: 'linear',
+                                display: true,
+                                position: 'right',
+                                title: { display: true, text: 'Tariff Rate (p/kWh)', color: '#e11d48' },
+                                grid: { drawOnChartArea: false },
+                                min: 0,
+                                max: 45
+                            }
+                        }
+                    }
+                });
+            }
+        }
+
+        window.onload = function() {
+            initTabs();
+            updateUI();
+        };
+    </script>
+</body>
+</html>
